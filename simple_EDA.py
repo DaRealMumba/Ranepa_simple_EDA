@@ -8,6 +8,7 @@ import numpy as np #Numpy
 from PIL import Image
 #from tqdm import tqdm
 import time
+from datetime import datetime 
 
 st.markdown('''<h1 style='text-align: center; color: black;'
             >Разведочный анализ данных</h1>''', 
@@ -32,6 +33,8 @@ expander_bar.markdown(
 \n **Полезно почитать:** [Про разведочный анализ данных](https://ru.wikipedia.org/wiki/Разведочный_анализ_данных), 
 [Про классификацию](http://www.machinelearning.ru/wiki/index.php?title=Классификация), [Про регрессию](http://www.machinelearning.ru/wiki/index.php?title=Регрессия)
 """)
+
+#custom_date_parser = lambda x: datetime.strptime(x, "%Y")
 
 options = st.selectbox('Выберите направление задачи',
   ('Задача классификации', 'Задача регрессии'))
@@ -65,13 +68,17 @@ if options == 'Задача регрессии':
 # \n**mos_houses.csv**: исследование объявлений о продаже квартир в Москве. Набор данных содержит информацию о самой квартире, ее расположении, наличии метро и т.д.
 #Целевая переменная - стоимость кваритры.
 
+# df = pd.read_csv('data/data_6.csv',  
+#                  parse_dates=['date'],  
+# date_parser=custom_date_parser)  
+  custom_date_parser = lambda x: datetime.strptime(x, "%Y")
   optionReg = st.selectbox(
   'Выберите фаил для регрессии',
   ('cars_price.csv', 'SaintP_houses.csv'))
   if optionReg == 'SaintP_houses.csv':
     input_Reg = pd.read_csv(optionReg, parse_dates=['дата публикации'])  #, sep=','
   else:
-    input_Reg = pd.read_csv(optionReg)
+    input_Reg = pd.read_csv(optionReg, parse_dates=['год'], date_parser=custom_date_parser)
   my_data = input_Reg
 
 # st.write('You selected:', option)
