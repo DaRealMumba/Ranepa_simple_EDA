@@ -1,12 +1,10 @@
+from turtle import width
 import streamlit as st
 import pandas as pd #Пандас
-# import matplotlib
 import matplotlib.pyplot as plt #Отрисовка графиков
 import seaborn as sns
 import numpy as np #Numpy
-#import pickle
 from PIL import Image
-#from tqdm import tqdm
 import time
 from datetime import datetime 
 
@@ -115,9 +113,11 @@ if st.checkbox('Выберите колонки, на которые хотит�
   my_data.columns.tolist())
   st.dataframe(my_data[cols])
 
-if st.checkbox('Уникальные значения целевой переменной'):
-  st.write('*Целевая переменная* -  признак датасета, который предстоит предсказывать модели машинного обучения')
-  st.write(pd.DataFrame(my_data.iloc[:, -1:].value_counts(), columns=['количество уникальных значений']))
+if st.checkbox('Уникальные значения переменной'):
+  cols = st.multiselect('Колонки', 
+  my_data.columns.tolist())
+  #st.write('*Целевая переменная* -  признак датасета, который предстоит предсказывать модели машинного обучения')
+  st.write(pd.DataFrame(my_data[cols].value_counts(), columns=['количество уникальных значений']))
 
 if st.checkbox('Типы данных'):
   expander_bar = st.expander('Информация об основных типах данных')
@@ -148,18 +148,19 @@ st.subheader('Попробуем построить несколько базо�
 vizPie  = st.checkbox('Построить график распределений по целевой переменной PiePlot') # придумать название
 if vizPie:
   if options == 'Задача регрессии':
-    labels = my_data.iloc[:, -1:].loc[:20].squeeze(axis=1).unique()
-    sizes = my_data.iloc[:, -1:].loc[:20].squeeze(axis=1).value_counts()
+    md = pd.DataFrame(my_data.iloc[:,-1:].value_counts()).reset_index().loc[:15]
+    labels = md.iloc[:,:1].squeeze(axis=1) # my_data.iloc[:, -1:].loc[:20].squeeze(axis=1).unique()
+    sizes =  md.iloc[:,-1:].squeeze(axis=1) # my_data.iloc[:, -1:].loc[:20].squeeze(axis=1).value_counts()
   else:
     labels = my_data.iloc[:, -1:].squeeze(axis=1).unique()
     sizes = my_data.iloc[:, -1:].squeeze(axis=1).value_counts()
   fig1, ax1 = plt.subplots()
-  ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
-        shadow=True, startangle=90)
+  ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
   ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-  plt.legend()
+  #plt.legend()
   show = plt.show()
   st.write('*PiePlot* - статистическая диаграмма, разделенная на срезы, которые иллюстрируют числовую пропорцию')
+  st.write('Чтобы можно было построить читаемый график, выберем топ 15 самых популярных значений')
   st.pyplot(show)
 
 #-----------------HistPlot--------------------
@@ -192,7 +193,9 @@ if vizHeat:
 #------------------BoxPlot--------------------
 vizBox = st.checkbox('Построить график формы распределения BoxPlot (Ящик с усами)') #Boxplot (Ящик с усами) — это график, отражающий форму распределение, медиану, квартили и выбросы.
 if vizBox:
-  st.write('*BoxPlot* - показывает медиану/среднее, нижний и верхний квартили, минимальное и максимальное значение выборки и ее выбросы')
+  st.write('*BoxPlot* - показывает медиану/среднее(линия внутри ящика), нижний и верхний квартили, минимальное и максимальное значение выборки и ее выбросы')
+  image = Image.open('boxplot.png')
+  st.image(image)
   fig, ax = plt.subplots() 
   fig = plt.figure(figsize=(20,10))
   plt.xticks(rotation=45)
@@ -204,7 +207,7 @@ if vizBox:
   else:
     ax_x = st.multiselect('Ось Х (выберите одну переменную)', my_data.iloc[:,:-1].columns.tolist())
     ax_y = st.multiselect('Ось У', my_data.iloc[:,-1:].columns.tolist()) 
-    ax = sns.boxplot(x=my_data[ax_x[0]].iloc[:50], y=my_data[ax_y[0]].iloc[:50])
+    ax = sns.boxplot(x=my_data[ax_x[0]], y=my_data[ax_y[0]])
   st.pyplot(fig)
 #------------------CatPlot--------------------
 # vizCount = st.checkbox('Построить категориальный график CatPlot')
@@ -231,7 +234,7 @@ if vizDiff:
   if plotType == 'bar chart':
     if genPlot:
       st.write('*Bar chart* - показывает изменения за определенный период времени. Также используется для сравнения значений данных нескольких объектов')
-      st.bar_chart(my_data[plotCols].iloc[:100])
+      st.bar_chart(my_data[plotCols].iloc[:60])
   if plotType == 'line chart':
     if genPlot:
       st.line_chart(my_data[plotCols].iloc[:100]) 
