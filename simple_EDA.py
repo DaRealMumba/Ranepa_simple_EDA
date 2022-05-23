@@ -25,7 +25,7 @@ expander_bar.markdown(
     """
 \nЗадача **классификации** - предсказание категории объекта и разделение объектов согласно определенным и заданным заранее признакам. Таким образом можно сортировать данные по нужным категориям: 
 одежду – по цветам или сезонам , книги – по жанрам или авторам, соусы – по степени остроты.
-\nЗадача **регресси** - предсказание целевой переменной по заданному набору признаков наблюдаемого объекта.
+\nЗадача **регрессии** - предсказание целевой переменной по заданному набору признаков наблюдаемого объекта.
 Таким образом можно прогнозировать цену недвижимости, капитализацию компании или стоимость акций. 
 \n**Используемые библиотеки:** [streamlit](https://docs.streamlit.io/library/get-started), [pandas](https://pandas.pydata.org/docs/user_guide/index.html), [matplotlib](https://matplotlib.org/stable/api/index.html), [seaborn](https://seaborn.pydata.org).
 \n **Полезно почитать:** [Про разведочный анализ данных](https://ru.wikipedia.org/wiki/Разведочный_анализ_данных), 
@@ -120,6 +120,7 @@ if st.checkbox('Уникальные значения переменной'):
   st.write(pd.DataFrame(my_data[cols].value_counts(), columns=['количество уникальных значений']))
 
 if st.checkbox('Типы данных'):
+  st.write('**Тип данных** - внутреннее представление, которое язык программирования использует для понимания того, как данные хранить и как ими оперировать')
   expander_bar = st.expander('Информация об основных типах данных')
   expander_bar.info('''Object - текстовые или смешанные числовые и нечисловые значения 
   \nINT - целые числа 
@@ -127,6 +128,7 @@ if st.checkbox('Типы данных'):
   \nBOOL - значения True/False
   \nDATETIME - значения даты и времени
   ''')
+
   st.write(pd.DataFrame(my_data.dtypes.astype('str'), columns=['тип данных']))
 
 if st.checkbox('Описательная статистика по всем числовым колонкам'):
@@ -135,33 +137,34 @@ if st.checkbox('Описательная статистика по всем чи
   \nMean - средняя велечина 
   \nStd - стандартное отклонение
   \nMin - минимальное значение
-  \n25%/50%/70% - перцентили (показывает значение, ниже которого падает определенный процент наблюдений)
+  \n25%/50%/70% - перцентили (показывают значение, ниже которого падает определенный процент наблюдений. Например, если число 5 - это 25% перцентиль, значит в наших данных 25% значений ниже 5)
   \nMax - максимальное значение
   ''')
   st.dataframe(my_data.describe())
 
 #-----------------Visualization---------------
 st.set_option('deprecation.showPyplotGlobalUse', False) # чтобы убрать warning при построении графика
+colors = ['indianred', 'steelblue', 'rosybrown', 'lightsteelblue','brown', 'darkgrey'] # Set project colors
 st.subheader('Попробуем построить несколько базовых графиков')
 
 #------------------PiePlot--------------------
-vizPie  = st.checkbox('Построить график распределений по целевой переменной PiePlot') # придумать название
-if vizPie:
-  if options == 'Задача регрессии':
-    md = pd.DataFrame(my_data.iloc[:,-1:].value_counts()).reset_index().loc[:15]
-    labels = md.iloc[:,:1].squeeze(axis=1) # my_data.iloc[:, -1:].loc[:20].squeeze(axis=1).unique()
-    sizes =  md.iloc[:,-1:].squeeze(axis=1) # my_data.iloc[:, -1:].loc[:20].squeeze(axis=1).value_counts()
-  else:
-    labels = my_data.iloc[:, -1:].squeeze(axis=1).unique()
-    sizes = my_data.iloc[:, -1:].squeeze(axis=1).value_counts()
-  fig1, ax1 = plt.subplots()
-  ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
-  ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-  #plt.legend()
-  show = plt.show()
-  st.write('*PiePlot* - статистическая диаграмма, разделенная на срезы, которые иллюстрируют числовую пропорцию')
-  st.write('Чтобы можно было построить читаемый график, выберем топ 15 самых популярных значений')
-  st.pyplot(show)
+# vizPie  = st.checkbox('Построить график распределений по целевой переменной PiePlot') # придумать название
+# if vizPie:
+#   if options == 'Задача регрессии':
+#     md = pd.DataFrame(my_data.iloc[:,-1:].value_counts()).reset_index().loc[:15]
+#     labels = md.iloc[:,:1].squeeze(axis=1) # my_data.iloc[:, -1:].loc[:20].squeeze(axis=1).unique()
+#     sizes =  md.iloc[:,-1:].squeeze(axis=1) # my_data.iloc[:, -1:].loc[:20].squeeze(axis=1).value_counts()
+#   else:
+#     labels = my_data.iloc[:, -1:].squeeze(axis=1).unique()
+#     sizes = my_data.iloc[:, -1:].squeeze(axis=1).value_counts()
+#   fig1, ax1 = plt.subplots()
+#   ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
+#   ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+#   #plt.legend()
+#   show = plt.show()
+#   st.write('*PiePlot* - статистическая диаграмма, разделенная на срезы, которые иллюстрируют числовую пропорцию')
+#   #st.write('Чтобы можно было построить читаемый график, выберем топ 15 самых популярных значений')
+#   st.pyplot(show)
 
 #-----------------HistPlot--------------------
 vizHist = st.checkbox('Построить гистораму распределения HistPlot')
@@ -179,8 +182,14 @@ if vizHist:
 vizHeat = st.checkbox('Построить график корреляции Correlation Heatmap')
 if vizHeat:
   st.write('*Correlation Heatmap* - графическое представление корреляционной матрицы, которая показывает зависимость между числовыми объектами')
+  expander_bar = st.expander('Подробнее о корреляционной матрице')
+  expander_bar.info(''' Корреляция - статистическая взаимосвязь двух или более переменных. Изменения значений одной переменной сопутствуют изменениям другой.
+  \nВ нашем слуаем зависимость выражется на промежутке от -1 до 1. 
+  \nЧем ближе значение к 1, тем сильнее прямая зависимость: увеличивая значения одной переменной, увеличивается значение и второй.
+  \nЧем ближе значение к -1, тем сильнее обратная зависимость: увеличивая значение одной переменной, уменьшается значение второй и наоброт. 
+  ''')
   fig, ax = plt.subplots(figsize=(20,10)) 
-  ax = sns.heatmap(my_data.corr(),vmin=-1, vmax=1, annot=True, cmap='RdBu',
+  ax = sns.heatmap(my_data.corr(),vmin=-1, vmax=1, annot=True, cmap='vlag',
                    center = 0, fmt='.1g', linewidths=1, linecolor='black')
   st.pyplot(fig)
 
@@ -193,7 +202,7 @@ if vizHeat:
 #------------------BoxPlot--------------------
 vizBox = st.checkbox('Построить график формы распределения BoxPlot (Ящик с усами)') #Boxplot (Ящик с усами) — это график, отражающий форму распределение, медиану, квартили и выбросы.
 if vizBox:
-  st.write('*BoxPlot* - показывает медиану/среднее(линия внутри ящика), нижний и верхний квартили, минимальное и максимальное значение выборки и ее выбросы')
+  st.write('*BoxPlot* - показывает медиану (линия внутри ящика), нижний (25%) и верхний квартили(75%), минимальное и максимальное значение выборки (усы) и ее выбросы')
   image = Image.open('boxplot.png')
   st.image(image)
   fig, ax = plt.subplots() 
@@ -201,14 +210,14 @@ if vizBox:
   plt.xticks(rotation=45)
   plt.ticklabel_format(style='plain')
   if options == 'Задача классификации':
-    ax_x = st.multiselect('Ось Х', my_data.iloc[:,-1:].columns.tolist())
-    ax_y = st.multiselect('Ось У (выберите одну переменную)', my_data.iloc[:,:-1].columns.tolist())
+    ax_x = st.multiselect('Ось Х (выберите одну переменную)', my_data.columns.tolist())
+    ax_y = st.multiselect('Ось У (выберите одну переменную)', my_data.columns.tolist())
     ax = sns.boxplot(x=my_data[ax_x[0]], y=my_data[ax_y[0]])
-  else:
-    ax_x = st.multiselect('Ось Х (выберите одну переменную)', my_data.iloc[:,:-1].columns.tolist())
-    ax_y = st.multiselect('Ось У', my_data.iloc[:,-1:].columns.tolist()) 
-    ax = sns.boxplot(x=my_data[ax_x[0]], y=my_data[ax_y[0]])
-  st.pyplot(fig)
+  # else:
+  #   ax_x = st.multiselect('Ось Х (выберите одну переменную)', my_data.iloc[:,:-1].columns.tolist())
+  #   ax_y = st.multiselect('Ось У', my_data.iloc[:,-1:].columns.tolist()) 
+  #   ax = sns.boxplot(x=my_data[ax_x[0]], y=my_data[ax_y[0]])
+    st.pyplot(fig)
 #------------------CatPlot--------------------
 # vizCount = st.checkbox('Построить категориальный график CatPlot')
 # if vizCount:
@@ -219,23 +228,36 @@ if vizBox:
 #                     height=10, aspect=1.5)
 #   st.pyplot(fig)
 
+#------------------ScatterPlot---------------
+vizScatter = st.checkbox('Построить диаграмму рассеяния ScatterPlot')
+if vizScatter:
+  st.write('**ScatterPlot** - помогает выявить взаимосвязи между переменными')
+  fig, ax = plt.subplots() 
+  fig = plt.figure(figsize=(30,15))
+  plt.xticks(rotation=75)
+  plt.ticklabel_format(style='plain')
+  ax_x = st.multiselect('Ось Х (выберите одну переменную)', my_data.columns.tolist())
+  ax_y = st.multiselect('Ось У (выберите одну переменную)', my_data.columns.tolist())
+  ax = sns.scatterplot(x=my_data[ax_x[0]], y=my_data[ax_y[0]])
+  st.pyplot(fig)
+
 #------------------OwnPlot--------------------
-vizDiff = st.checkbox('Постройте свой график')
-if vizDiff:
-  plotType = st.selectbox('Выберите вид графика',
-                       ('area chart', 'bar chart', 'line chart'))
-  plotCols = st.multiselect('Выберите колонки по которым будем строить график',
-                       my_data.columns.tolist())
-  genPlot = st.button('Построить график')
-  if plotType == 'area chart':
-    if genPlot:
-      st.write('*Area chart* - отображает количественные данные в графическом виде')
-      st.area_chart(my_data[plotCols].iloc[:100])
-  if plotType == 'bar chart':
-    if genPlot:
-      st.write('*Bar chart* - показывает изменения за определенный период времени. Также используется для сравнения значений данных нескольких объектов')
-      st.bar_chart(my_data[plotCols].iloc[:60])
-  if plotType == 'line chart':
-    if genPlot:
-      st.line_chart(my_data[plotCols].iloc[:100]) 
+# vizDiff = st.checkbox('Постройте свой график')
+# if vizDiff:
+#   plotType = st.selectbox('Выберите вид графика',
+#                        ('area chart', 'bar chart', 'line chart'))
+#   plotCols = st.multiselect('Выберите колонки по которым будем строить график',
+#                        my_data.columns.tolist())
+#   genPlot = st.button('Построить график')
+#   if plotType == 'area chart':
+#     if genPlot:
+#       st.write('*Area chart* - отображает количественные данные в графическом виде')
+#       st.area_chart(my_data[plotCols].iloc[:100])
+#   if plotType == 'bar chart':
+#     if genPlot:
+#       st.write('*Bar chart* - показывает изменения за определенный период времени. Также используется для сравнения значений данных нескольких объектов')
+#       st.bar_chart(my_data[plotCols].iloc[:60])
+#   if plotType == 'line chart':
+#     if genPlot:
+#       st.line_chart(my_data[plotCols].iloc[:100]) 
 
