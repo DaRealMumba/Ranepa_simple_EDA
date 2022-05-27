@@ -11,8 +11,6 @@ from datetime import datetime
 st.markdown('''<h1 style='text-align: center; color: black;'
             >Разведочный анализ данных</h1>''', 
             unsafe_allow_html=True)
-# img = Image.open('2_RANEPA.png') #1_RANEPA.jpg or 2_RANEPA.png
-# st.image(img, use_column_width='auto') #width=400
 
 st.write("""
 Данный сримлит предназначен для наглядной демонтрации студентам простейших способов разведочного анализа данных (EDA - exploratory data analysis) для двух задач машинного обучения: классификация и регрессия.
@@ -31,8 +29,6 @@ expander_bar.markdown(
 \n **Полезно почитать:** [Про разведочный анализ данных](https://ru.wikipedia.org/wiki/Разведочный_анализ_данных), 
 [Про классификацию](http://www.machinelearning.ru/wiki/index.php?title=Классификация), [Про регрессию](http://www.machinelearning.ru/wiki/index.php?title=Регрессия)
 """)
-
-#custom_date_parser = lambda x: datetime.strptime(x, "%Y")
 
 options = st.selectbox('Выберите направление задачи',
   ('Задача классификации', 'Задача регрессии'))
@@ -63,12 +59,7 @@ if options == 'Задача регрессии':
 \n**SainP_houses.csv**: исследование объявлений с сервиса Яндекс.Недвижимость о продаже квартир в Санкт-Петербурге. Набор данных содержит информацию о самой квартире, ее расположении, наличии по близости торговых центров/аэропортов/прудов и т.д.
 Целевая переменная - стоимость кваритры.
 """)
-# \n**mos_houses.csv**: исследование объявлений о продаже квартир в Москве. Набор данных содержит информацию о самой квартире, ее расположении, наличии метро и т.д.
-#Целевая переменная - стоимость кваритры.
 
-# df = pd.read_csv('data/data_6.csv',  
-#                  parse_dates=['date'],  
-# date_parser=custom_date_parser)  
   custom_date_parser = lambda x: datetime.strptime(x, "%Y")
   optionReg = st.selectbox(
   'Выберите фаил для регрессии',
@@ -78,16 +69,6 @@ if options == 'Задача регрессии':
   else:
     input_Reg = pd.read_csv(optionReg, parse_dates=['год'], date_parser=custom_date_parser)
   my_data = input_Reg
-
-# st.write('You selected:', option)
-
-# if optionClass == 'wildfires.csv':
-#   input_df = pd.read_csv(optionClass, delimiter=',', parse_dates=['dt'])
-# else:
-#   input_df = pd.read_csv(optionClass)
-
-# if optionReg:
-#   input_df = pd.read_csv(optionReg)
 
  
 st.subheader('Посмотрим на данные')
@@ -116,7 +97,6 @@ if st.checkbox('Выберите колонки, на которые хотит�
 if st.checkbox('Уникальные значения переменной'):
   cols = st.multiselect('Колонки', 
   my_data.columns.tolist())
-  #st.write('*Целевая переменная* -  признак датасета, который предстоит предсказывать модели машинного обучения')
   st.write(pd.DataFrame(my_data[cols].value_counts(), columns=['количество уникальных значений']))
 
 if st.checkbox('Типы данных'):
@@ -147,32 +127,13 @@ st.set_option('deprecation.showPyplotGlobalUse', False) # чтобы убрат�
 colors = ['indianred', 'steelblue', 'rosybrown', 'lightsteelblue','brown', 'darkgrey'] # Set project colors
 st.subheader('Попробуем построить несколько базовых графиков')
 
-#------------------PiePlot--------------------
-# vizPie  = st.checkbox('Построить график распределений по целевой переменной PiePlot') # придумать название
-# if vizPie:
-#   if options == 'Задача регрессии':
-#     md = pd.DataFrame(my_data.iloc[:,-1:].value_counts()).reset_index().loc[:15]
-#     labels = md.iloc[:,:1].squeeze(axis=1) # my_data.iloc[:, -1:].loc[:20].squeeze(axis=1).unique()
-#     sizes =  md.iloc[:,-1:].squeeze(axis=1) # my_data.iloc[:, -1:].loc[:20].squeeze(axis=1).value_counts()
-#   else:
-#     labels = my_data.iloc[:, -1:].squeeze(axis=1).unique()
-#     sizes = my_data.iloc[:, -1:].squeeze(axis=1).value_counts()
-#   fig1, ax1 = plt.subplots()
-#   ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
-#   ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-#   #plt.legend()
-#   show = plt.show()
-#   st.write('*PiePlot* - статистическая диаграмма, разделенная на срезы, которые иллюстрируют числовую пропорцию')
-#   #st.write('Чтобы можно было построить читаемый график, выберем топ 15 самых популярных значений')
-#   st.pyplot(show)
-
 #-----------------HistPlot--------------------
 vizHist = st.checkbox('Построить гистораму распределения HistPlot')
 if vizHist:
   st.write('*HistPlot* - показывает распредление числовых значений объекта')
   option = st.selectbox('Выберите колонку', my_data.select_dtypes(exclude=['object']).columns)
-  button = st.button('Построить')
-  if button:
+  button_hist = st.button('Построить')
+  if button_hist:
     fig, ax = plt.subplots()
     fig = plt.figure(figsize=(20,10))
     plt.ticklabel_format(style='plain')
@@ -195,12 +156,6 @@ if vizHeat:
                    center = 0, fmt='.1g', linewidths=1, linecolor='black')
   st.pyplot(fig)
 
-# with sns.axes_style("white"):
-#         f, ax = plt.subplots(figsize=(14, 10))
-#         ax = sns.heatmap(corr, annot = True, vmin=-1, vmax=1, center= 0, 
-#         cmap= 'coolwarm', fmt='.1g', linewidths=1, linecolor='black') # mask=mask, vmax=1, square=True
-#     st.pyplot(f)
-
 #------------------BoxPlot--------------------
 vizBox = st.checkbox('Построить график формы распределения BoxPlot (Ящик с усами)') #Boxplot (Ящик с усами) — это график, отражающий форму распределение, медиану, квартили и выбросы.
 if vizBox:
@@ -217,22 +172,10 @@ if vizBox:
   plt.ticklabel_format(style='plain')
   ax_x = st.selectbox('Ось Х', my_data.columns.tolist())
   ax_y = st.selectbox('Ось У', my_data.columns.tolist())
-  if st.button('Построить'):
+  button_box = st.button('Построить')
+  if button_box:
     ax = sns.boxplot(x=my_data[ax_x], y=my_data[ax_y])
-  # else:
-  #   ax_x = st.multiselect('Ось Х (выберите одну переменную)', my_data.iloc[:,:-1].columns.tolist())
-  #   ax_y = st.multiselect('Ось У', my_data.iloc[:,-1:].columns.tolist()) 
-  #   ax = sns.boxplot(x=my_data[ax_x[0]], y=my_data[ax_y[0]])
     st.pyplot(fig)
-#------------------CatPlot--------------------
-# vizCount = st.checkbox('Построить категориальный график CatPlot')
-# if vizCount:
-#   tar = st.multiselect('Целевая переменная', my_data.iloc[:,-1:].columns)
-#   ax_x = st.multiselect('Выберите колонку (ось Х)',my_data.iloc[:,:-1].columns.tolist())
-#   ax_y = st.multiselect('Выберите колонку (ось Y)', my_data.iloc[:,:-1].columns.tolist()) 
-#   fig = sns.catplot(data = my_data, x=ax_x[0], y=ax_y[0], hue=tar[0], 
-#                     height=10, aspect=1.5)
-#   st.pyplot(fig)
 
 #------------------ScatterPlot---------------
 vizScatter = st.checkbox('Построить диаграмму рассеяния ScatterPlot')
@@ -244,27 +187,8 @@ if vizScatter:
   plt.ticklabel_format(style='plain')
   ax_x = st.selectbox('Ось Х', my_data.columns.tolist())
   ax_y = st.selectbox('Ось У', my_data.columns.tolist())
-  if st.button('Построить'):
+  button_scatter = st.button('Построить')
+  if button_scatter:
     ax = sns.scatterplot(x=my_data[ax_x], y=my_data[ax_y])
     st.pyplot(fig)
-
-#------------------OwnPlot--------------------
-# vizDiff = st.checkbox('Постройте свой график')
-# if vizDiff:
-#   plotType = st.selectbox('Выберите вид графика',
-#                        ('area chart', 'bar chart', 'line chart'))
-#   plotCols = st.multiselect('Выберите колонки по которым будем строить график',
-#                        my_data.columns.tolist())
-#   genPlot = st.button('Построить график')
-#   if plotType == 'area chart':
-#     if genPlot:
-#       st.write('*Area chart* - отображает количественные данные в графическом виде')
-#       st.area_chart(my_data[plotCols].iloc[:100])
-#   if plotType == 'bar chart':
-#     if genPlot:
-#       st.write('*Bar chart* - показывает изменения за определенный период времени. Также используется для сравнения значений данных нескольких объектов')
-#       st.bar_chart(my_data[plotCols].iloc[:60])
-#   if plotType == 'line chart':
-#     if genPlot:
-#       st.line_chart(my_data[plotCols].iloc[:100]) 
 
