@@ -170,13 +170,15 @@ st.subheader('Попробуем построить несколько базо�
 vizHist = st.checkbox('Построить гистораму распределения HistPlot')
 if vizHist:
   st.write('*HistPlot* - показывает распредление числовых значений объекта')
-  option = st.multiselect('Выберите одну переменную', my_data.select_dtypes(exclude=['object']).columns)
-  fig, ax = plt.subplots()
-  fig = plt.figure(figsize=(20,10))
-  plt.ticklabel_format(style='plain')
-  ax = sns.histplot(data = my_data, x = my_data[option[0]], kde = True)
-  sns.set(style='darkgrid')
-  st.pyplot(fig)
+  option = st.selectbox('Выберите колонку', my_data.select_dtypes(exclude=['object']).columns)
+  button = st.button('Построить')
+  if button:
+    fig, ax = plt.subplots()
+    fig = plt.figure(figsize=(20,10))
+    plt.ticklabel_format(style='plain')
+    ax = sns.histplot(data = my_data, x = my_data[option], kde = True)
+    sns.set(style='darkgrid')
+    st.pyplot(fig)
 
 #------------------HeatMap--------------------
 vizHeat = st.checkbox('Построить график корреляции Correlation Heatmap')
@@ -203,16 +205,20 @@ if vizHeat:
 vizBox = st.checkbox('Построить график формы распределения BoxPlot (Ящик с усами)') #Boxplot (Ящик с усами) — это график, отражающий форму распределение, медиану, квартили и выбросы.
 if vizBox:
   st.write('*BoxPlot* - показывает медиану (линия внутри ящика), нижний (25%) и верхний квартили(75%), минимальное и максимальное значение выборки (усы) и ее выбросы')
+  expander_bar = st.expander('Подробнее о квартиле')
+  expander_bar.info(''' Квартили -  значения, которые делят данные на 4 группы (25%,50%,75%,100%), содержащие приблизительно равное количество наблюдений. 
+  \nПо сути, это то же самое, что и перцентиль. То есть нижний квартиль - 25 перцентиль, а верхний квартиль - 75 перцентиль
+  ''')
   image = Image.open('boxplot.png')
   st.image(image)
   fig, ax = plt.subplots() 
   fig = plt.figure(figsize=(20,10))
   plt.xticks(rotation=45)
   plt.ticklabel_format(style='plain')
-  if options == 'Задача классификации':
-    ax_x = st.multiselect('Ось Х (выберите одну переменную)', my_data.columns.tolist())
-    ax_y = st.multiselect('Ось У (выберите одну переменную)', my_data.columns.tolist())
-    ax = sns.boxplot(x=my_data[ax_x[0]], y=my_data[ax_y[0]])
+  ax_x = st.selectbox('Ось Х', my_data.columns.tolist())
+  ax_y = st.selectbox('Ось У', my_data.columns.tolist())
+  if st.button('Построить'):
+    ax = sns.boxplot(x=my_data[ax_x], y=my_data[ax_y])
   # else:
   #   ax_x = st.multiselect('Ось Х (выберите одну переменную)', my_data.iloc[:,:-1].columns.tolist())
   #   ax_y = st.multiselect('Ось У', my_data.iloc[:,-1:].columns.tolist()) 
@@ -236,10 +242,11 @@ if vizScatter:
   fig = plt.figure(figsize=(30,15))
   plt.xticks(rotation=75)
   plt.ticklabel_format(style='plain')
-  ax_x = st.multiselect('Ось Х (выберите одну переменную)', my_data.columns.tolist())
-  ax_y = st.multiselect('Ось У (выберите одну переменную)', my_data.columns.tolist())
-  ax = sns.scatterplot(x=my_data[ax_x[0]], y=my_data[ax_y[0]])
-  st.pyplot(fig)
+  ax_x = st.selectbox('Ось Х', my_data.columns.tolist())
+  ax_y = st.selectbox('Ось У', my_data.columns.tolist())
+  if st.button('Построить'):
+    ax = sns.scatterplot(x=my_data[ax_x], y=my_data[ax_y])
+    st.pyplot(fig)
 
 #------------------OwnPlot--------------------
 # vizDiff = st.checkbox('Постройте свой график')
