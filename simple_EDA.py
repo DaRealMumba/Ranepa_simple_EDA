@@ -1,22 +1,25 @@
-#from turtle import width
+# импортируем необходимые библиотеки
 import streamlit as st
-import pandas as pd #Пандас
+import pandas as pd 
 import matplotlib.pyplot as plt #Отрисовка графиков
 import seaborn as sns
-import numpy as np #Numpy
+import numpy as np 
 from PIL import Image
-import time
 from datetime import datetime 
 
+#задаем загаловок сайта
 st.markdown('''<h1 style='text-align: center; color: black;'
             >Разведочный анализ данных</h1>''', 
             unsafe_allow_html=True)
 
+#добавим фотографию пайплайн стримлита
 image = Image.open('images/Pipeline.png')
 st.image(image)
 
+#краткое описание стримлита
 st.write("""
-Данный стримлит предназначен для наглядной демонтрации студентам простейших способов разведочного анализа данных (EDA - exploratory data analysis) для двух задач машинного обучения: классификация и регрессия.
+Данный стримлит предназначен для наглядной демонтрации студентам простейших способов разведочного анализа данных (EDA - exploratory data analysis) для двух задач машинного обучения: 
+классификация и регрессия.
 """)
 #-------------------------О проекте-------------------------
 expander_bar = st.expander("Перед тем, как начать:")
@@ -26,11 +29,13 @@ expander_bar.markdown(
 одежду – по цветам или сезонам , книги – по жанрам или авторам, соусы – по степени остроты.
 \nЗадача **регрессии** - предсказание целевой переменной по заданному набору признаков наблюдаемого объекта.
 Таким образом можно прогнозировать цену недвижимости, капитализацию компании или стоимость акций. 
-\n**Используемые библиотеки:** [streamlit](https://docs.streamlit.io/library/get-started), [pandas](https://pandas.pydata.org/docs/user_guide/index.html), [matplotlib](https://matplotlib.org/stable/api/index.html), [seaborn](https://seaborn.pydata.org).
+\n**Используемые библиотеки:** [streamlit](https://docs.streamlit.io/library/get-started), [pandas](https://pandas.pydata.org/docs/user_guide/index.html), [matplotlib](https://matplotlib.org/stable/api/index.html), 
+[seaborn](https://seaborn.pydata.org).
 \n **Полезно почитать:** [Про разведочный анализ данных](https://ru.wikipedia.org/wiki/Разведочный_анализ_данных), 
 [Про классификацию](http://www.machinelearning.ru/wiki/index.php?title=Классификация), [Про регрессию](http://www.machinelearning.ru/wiki/index.php?title=Регрессия)
 """)
 
+#Даем студенту возможность выбрать самому задачу и данные (вместе с их описанием)
 options = st.selectbox('Выберите направление задачи',
   ('Задача классификации', 'Задача регрессии'))
 
@@ -38,15 +43,17 @@ if options == 'Задача классификации':
   expander_bar = st.expander("Описание файлов:")
   expander_bar.markdown(
 """
-\n**borrowers.csv**: исследование надежности заемщиков. Набор данных содержит личные сведения о каждом заемщике. Целевая переменная - была ли задолженность по возврату кредита (0 - задолженности не было; 1 - задолженость была).
+\n**borrowers.csv**: исследование надежности заемщиков. Набор данных содержит личные сведения о каждом заемщике. Целевая переменная - была ли задолженность по возврату кредита (0 - задолженности не было; 
+1 - задолженость была).
 \n**wildfires.csv**: пожары в России. Набор данных содержит сведения МЧС России о географических точках, типах и датах природных пожаров, происходивших на территории России с 2012 по 2021 годы.
 Целевая переменная - сколько часов было потрачено, чтобы потушить пожар полностью.
 """)
   optionClass = st.selectbox(
   'Выберите фаил для классификации',
   ('borrowers.csv', 'wildfires.csv'))
+  #чтобы правильно считывать датасеты
   if optionClass == 'wildfires.csv':
-    input_Class = pd.read_csv(optionClass, parse_dates=['дата']) #delimiter=','
+    input_Class = pd.read_csv(optionClass, parse_dates=['дата'])
   else:
     input_Class = pd.read_csv(optionClass)
   my_data = input_Class
@@ -57,7 +64,8 @@ if options == 'Задача регрессии':
 """
 \n**cars.csv**: исследование объявлений о продаже машин. Набор данных содержит информацию о марке машины, ее пробеге, объеме и типе двигателя и т.д.
 Целевая переменная - стоимость машины
-\n**SainP_houses.csv**: исследование объявлений с сервиса Яндекс.Недвижимость о продаже квартир в Санкт-Петербурге. Набор данных содержит информацию о самой квартире, ее расположении, наличии по близости торговых центров/аэропортов/прудов и т.д.
+\n**SainP_houses.csv**: исследование объявлений с сервиса Яндекс.Недвижимость о продаже квартир в Санкт-Петербурге. Набор данных содержит информацию о самой квартире, ее расположении, наличии по близости торговых 
+центров/аэропортов/прудов и т.д.
 Целевая переменная - стоимость кваритры.
 """)
 
@@ -65,41 +73,48 @@ if options == 'Задача регрессии':
   optionReg = st.selectbox(
   'Выберите фаил для регрессии',
   ('cars_price.csv', 'SaintP_houses.csv'))
+  #чтобы правильно считывать датасеты
   if optionReg == 'SaintP_houses.csv':
     input_Reg = pd.read_csv(optionReg, parse_dates=['дата публикации'])  #, sep=','
   else:
     input_Reg = pd.read_csv(optionReg, parse_dates=['год'], date_parser=custom_date_parser)
   my_data = input_Reg
 
- 
+#---------------------Знакомимся с данными----------- 
 st.subheader('Посмотрим на данные')
 
+#покажем сам датасет, студент сможет сам котнролировать количество выводимых строк
 if st.checkbox('Показать Датасет'):
   number = st.number_input('Сколько строк показать', min_value=1, max_value=my_data.shape[1])
   st.dataframe(my_data.head(number))
 
-if st.checkbox('Название колонок'):
-  st.write(pd.DataFrame(my_data.columns, columns=['название колонок']))
+#выведем названия всех столбуов (фичей)
+if st.checkbox('Название столбцов'):
+  st.write(pd.DataFrame(my_data.columns, columns=['название столбцов']))
 
+#покажем по отдельности кол-во строк и столбцов
 if st.checkbox('Размер Датасета'):
   shape = st.radio(
     "Выбор данных",
-     ('Строки', 'Колонки'))
+     ('Строки', 'Столбцов'))
   if shape == 'Строки':
     st.write('Количество строк:', my_data.shape[0])
-  elif shape == 'Колонки':
-    st.write('Количество колонок:', my_data.shape[1])
+  elif shape == 'Столбцы':
+    st.write('Количество столбцов:', my_data.shape[1])
 
-if st.checkbox('Выберите колонки, на которые хотите посмотреть'):
-  cols = st.multiselect('Колонки', 
+#студент может выбрать один или несколько столбцов для просмотра
+if st.checkbox('Выберите столбцы, на которые хотите посмотреть'):
+  cols = st.multiselect('Столбцы', 
   my_data.columns.tolist())
   st.dataframe(my_data[cols])
 
+#Посмотрим на уникальные значения 
 if st.checkbox('Уникальные значения переменной'):
-  cols = st.multiselect('Колонки', 
+  cols = st.multiselect('Столбцы', 
   my_data.columns.tolist())
   st.write(pd.DataFrame(my_data[cols].value_counts(), columns=['количество уникальных значений']))
 
+#Познакомимся с типами данных
 if st.checkbox('Типы данных'):
   st.write('**Тип данных** - внутреннее представление, которое язык программирования использует для понимания того, как данные хранить и как ими оперировать')
   expander_bar = st.expander('Информация об основных типах данных')
@@ -112,6 +127,7 @@ if st.checkbox('Типы данных'):
 
   st.write(pd.DataFrame(my_data.dtypes.astype('str'), columns=['тип данных']))
 
+#посмотрим на статистику 
 if st.checkbox('Описательная статистика по всем числовым колонкам'):
   expander_bar = st.expander('Информация о данных, которые входят в описательную статистику')
   expander_bar.info('''Count - сколько всего было записей 
@@ -123,12 +139,12 @@ if st.checkbox('Описательная статистика по всем чи
   ''')
   st.dataframe(my_data.describe())
 
-#-----------------Visualization---------------
+#-----------------Строим графики---------------
 st.set_option('deprecation.showPyplotGlobalUse', False) # чтобы убрать warning при построении графика
 colors = ['indianred', 'steelblue', 'rosybrown', 'lightsteelblue','brown', 'darkgrey'] # Set project colors
 st.subheader('Попробуем построить несколько базовых графиков')
 
-#-----------------HistPlot--------------------
+#-----------------Гистограмма--------------------
 vizHist = st.checkbox('Построить гистораму распределения HistPlot')
 if vizHist:
   st.write('*HistPlot* - показывает распредление числовых значений объекта')
@@ -142,7 +158,7 @@ if vizHist:
     sns.set(style='darkgrid')
     st.pyplot(fig)
 
-#------------------HeatMap--------------------
+#------------------График корреляции--------------------
 vizHeat = st.checkbox('Построить график корреляции Correlation Heatmap')
 if vizHeat:
   st.write('*Correlation Heatmap* - графическое представление корреляционной матрицы, которая показывает зависимость между числовыми объектами')
@@ -157,8 +173,8 @@ if vizHeat:
                    center = 0, fmt='.1g', linewidths=1, linecolor='black')
   st.pyplot(fig)
 
-#------------------BoxPlot--------------------
-vizBox = st.checkbox('Построить график формы распределения BoxPlot (Ящик с усами)') #Boxplot (Ящик с усами) — это график, отражающий форму распределение, медиану, квартили и выбросы.
+#------------------Ящик с усами--------------------
+vizBox = st.checkbox('Построить график формы распределения BoxPlot (Ящик с усами)')
 if vizBox:
   st.write('*BoxPlot* - показывает медиану (линия внутри ящика), нижний (25%) и верхний квартили(75%), минимальное и максимальное значение выборки (усы) и ее выбросы')
   expander_bar = st.expander('Подробнее о квартиле')
@@ -178,7 +194,7 @@ if vizBox:
     ax = sns.boxplot(x=my_data[ax_x], y=my_data[ax_y])
     st.pyplot(fig)
 
-#------------------ScatterPlot---------------
+#------------------Диаграмма рассеяния---------------
 vizScatter = st.checkbox('Построить диаграмму рассеяния ScatterPlot')
 if vizScatter:
   st.write('**ScatterPlot** - помогает выявить взаимосвязи между переменными')
@@ -193,9 +209,10 @@ if vizScatter:
     ax = sns.scatterplot(x=my_data[ax_x], y=my_data[ax_y])
     st.pyplot(fig)
 
-#-------------------Laba--------------------
+#-------------------Задачи к лабораторной работе--------------------
 st.subheader('Лабораторная работа по визуализации')
 
+#для каждого датасета по 2-3 задачи 
 options_2 = st.selectbox('Выберите датасет:',
   ('Borrowers.csv', 'Wildfires.csv', 'Cars.csv', 'SaintP.csv'))
 
