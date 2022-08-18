@@ -103,16 +103,18 @@ if st.checkbox('Размер Датасета'):
     st.write('Количество столбцов:', my_data.shape[1])
 
 #студент может выбрать один или несколько столбцов для просмотра
-if st.checkbox('Выберите столбцы, на которые хотите посмотреть'):
-  cols = st.multiselect('Столбцы', 
+show_cols = st.checkbox('Выберите столбцы, на которые хотите посмотреть')
+if show_cols:
+  cols_to_show = st.multiselect('Столбцы', 
   my_data.columns.tolist())
-  st.dataframe(my_data[cols])
+  st.dataframe(my_data[cols_to_show])
 
 #Посмотрим на уникальные значения 
-if st.checkbox('Уникальные значения переменной'):
-  cols = st.multiselect('Столбцы', 
+n_unique = st.checkbox('Уникальные значения переменной')
+if n_unique:
+  n_cols = st.multiselect('Столбцы ', 
   my_data.columns.tolist())
-  st.write(pd.DataFrame(my_data[cols].value_counts(), columns=['количество уникальных значений']))
+  st.write(pd.DataFrame(my_data[n_cols].value_counts(), columns=['количество уникальных значений']))
 
 #Познакомимся с типами данных
 if st.checkbox('Типы данных'):
